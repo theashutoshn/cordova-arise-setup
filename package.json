@@ -1,0 +1,15 @@
+{
+    "name": "cordova-arise-setup",
+    "version": "1.0.0",
+    "description": "One-shot setup for Offline WebVR Cordova apps (CSP, launcher, plugins, netsec, config, resources).",
+    "bin": {
+        "cordova-arise-setup": "index.js"
+    },
+    "type": "module",
+    "license": "MIT",
+    "author": "Ashutosh",
+    "engines": {
+        "node": ">=16"
+    },
+    "dependencies": {}
+}

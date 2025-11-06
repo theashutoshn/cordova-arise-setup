@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="cordova.js"></script>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: blob: gap: http://127.0.0.1:* http://localhost:* https://* 'unsafe-inline' 'unsafe-eval';">
+</head>
+
+<body>
+    <script>
+        document.addEventListener('deviceready', async function () {
+            const httpd = cordova?.plugins?.CorHttpd;
+            if (!httpd) { console.error('cordova-plugin-httpd missing'); return; }
+
+            // 1) Give each app its own port to avoid collisions
+            //    Pick one unique port per app and hardcode it (e.g., 18081, 18082, …)
+            const ROOT = 'web';
+            const PORT = window.LAUNCHER_PORT || 18081; // <— CHANGE PER APP (no overlaps)
+
+            function openInOculus(baseUrl) {
+                const url = baseUrl.replace(/\/$/, '') + '/index.html';
+                if (cordova.InAppBrowser) cordova.InAppBrowser.open(url, '_system');
+                else window.location.href = url;
+            }
+
+            function startServer() {
+                httpd.startServer({
+                    www_root: ROOT,
+                    port: PORT,
+                    localhost_only: true,
+                    // DO NOT set COOP/COEP unless you really need SAB.
+                    // customHeaders: { ... }
+                }, function (url) {
+                    console.log('httpd at', url);
+                    openInOculus(url);
+                }, function (err) {
+                    console.error('httpd start error:', err);
+                    // If this exact port is taken (another app), show a friendly message.
+                    // Or fall back to a per-app secondary port if you must.
+                });
+            }
+
+            // If server already running, reuse; else start
+            httpd.getURL(function (url) {
+                if (url) openInOculus(url); else startServer();
+            }, startServer);
+
+            // IMPORTANT: Do NOT stop on pause/resign
+            // document.addEventListener('pause',  () => {});
+            // document.addEventListener('resign', () => {});
+
+            // Stop only when actually quitting the app
+            document.addEventListener('backbutton', function () {
+                httpd.stopServer(function () { navigator.app.exitApp(); }, function () {
+                    navigator.app.exitApp();
+                });
+            }, false);
+        });
+
+    </script>
+</body>
+
+</html>
