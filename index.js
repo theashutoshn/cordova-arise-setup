@@ -23,7 +23,8 @@ for (let i = 0; i < args.length; i++) {
 
 const root = path.resolve(process.cwd(), opts.projectPath);
 const WWW = path.join(root, "www");
-const INDEX_HTML = path.join(WWW, "index.html");
+const WEB = path.join(WWW, "web");
+const INDEX_HTML = path.join(WEB, "index.html");
 const LAUNCHER_HTML = path.join(WWW, "launcher.html");
 const CONFIG_XML = path.join(root, "config.xml");
 const RES_XML_DIR = path.join(root, "res", "xml");
